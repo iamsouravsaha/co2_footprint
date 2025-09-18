@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Carbon Footprint Calculator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: 
+        linear-gradient(135deg, #D2E8A4, rgba(23, 45, 36, 0.7)),
+        url("images/ewaste.png") no-repeat center center/cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      padding: 30px;
+      width: 400px;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    h2 { margin-bottom: 20px; color: #333; }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      text-align: left;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: 0.3s;
+    }
+    input:focus {
+      border-color: #66a6ff;
+      box-shadow: 0 0 8px rgba(26, 91, 52, 0.5);
+    }
+    button {
+      background: linear-gradient(135deg, #8cecac, #2a4b2b);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+      width: 100%;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #afd6ba, #162a14);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo -->
+    <img src="images/logo.png" alt="Logo" style="width:80px; margin-bottom:15px;">
+
+    <h2>🌍 Carbon Footprint Calculator</h2>
+    <form id="lifeForm">
+      <label for="electricity1">📱 Phone Charging (hours/day):</label>
+      <input type="number" id="electricity1" min="0" required>
+
+      <label for="electricity2">💻 Computer/Laptop Usage (hours/day):</label>
+      <input type="number" id="electricity2" min="0" required>
+
+      <label for="transportation">🚌 Travelling Cost (₹/day):</label>
+      <input type="number" id="transportation" min="0" required>
+
+      <button type="submit">Calculate</button>
+    </form>
+  </div>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function calculateFootprint() {
+      // Electricity consumption
+      var electricity1 = parseFloat(document.getElementById("electricity1").value);
+      var electricity2 = parseFloat(document.getElementById("electricity2").value);
+
+      var electricityTotal = (electricity1 * 5) + (electricity2 * 120);
+      var electricityFinal = (electricityTotal / 1000) * 0.85; // 0.85 EF
+
+      // Transportation
+      var transportation = parseFloat(document.getElementById("transportation").value);
+      var transportationTotal = transportation / 106.03; // fuel price
+      var transportationFinal = transportationTotal * 2.296; // EF petrol
+
+      var total = electricityFinal + transportationFinal;
+      var totalThirty = total * 30;
+
+      // tree plantation factor
+      var totalTreePlantation = (55.5 / 1500 ) * totalThirty;
+
+      // Recycling offset: assume 1 kg recycle saves ~2.5 kgCO2e
+      var recycleNeeded = (total / 2.5);
+
+      return {
+        perDay: total.toFixed(2),
+        perMonth: totalThirty.toFixed(2),
+        trees: totalTreePlantation.toFixed(2),
+        recycle: recycleNeeded.toFixed(2)
+      };
+    }
+
+    document.getElementById("lifeForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      let result = calculateFootprint();
+
+      Swal.fire({
+        title: "✅ Your Carbon Footprint",
+        html: `
+          <div style="text-align:left;">
+            <p>🌱 Per Day: <b>${result.perDay} kgCO₂e</b></p>
+            <p>📅 Per Month: <b>${result.perMonth} kgCO₂e</b></p>
+            <p>🌳 Trees Needed (per month): <b>${result.trees}</b></p>
+            <hr>
+            <p>♻️ To offset <b>${result.perDay} kgCO₂e/day</b>, 
+               you need to recycle about <b>${result.recycle} kg/day</b>.</p>
+          </div>
+        `,
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#2FB850",
+        background: "#f9f9ff",
+        width: 430
+      });
+    });
+  </script>
+</body>
+</html>
